@@ -18,7 +18,7 @@ spring:
           kakao:
             client_id: 4669985b9b5311232c052c08ba9aa67d
             client-secret: ksxiB96VlzlFAWP0wEyg4jsXzxV7pZCs
-            redirect-uri: https://jjubul-auth/auth/kakao/callback
+            redirect-uri: https://jjubul-auth.duckdns.org/auth/kakao/callback
             scope: openid
             authorization-grant-type: authorization_code
             client-authentication-method: client_secret_post
@@ -29,7 +29,7 @@ spring:
             client-secret: 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
             scope: openid
             provider: google
-            redirect-uri: https://jjubul-auth/auth/google/callback
+            redirect-uri: https://jjubul-auth.duckdns.org/auth/google/callback
 
         provider:
           kakao:
