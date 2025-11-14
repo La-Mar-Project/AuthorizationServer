@@ -35,7 +35,7 @@ jobs:
       - name: Run Tests
         run: ./gradlew test
 
-      # 분석 비활성화
+      # 분석 (이후 추가예정)
       - name: Static Analysis
         run: echo "분석 비활성화, 이후 추가"
 
