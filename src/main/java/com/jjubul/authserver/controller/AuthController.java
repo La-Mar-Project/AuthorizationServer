@@ -86,7 +86,6 @@ public class AuthController {
                 .build();
     }
 
-
     @GetMapping("/{provider}/callback")
     public ResponseEntity<String> callback(@RequestParam String code, @PathVariable String provider) {
 

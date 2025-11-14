@@ -26,10 +26,12 @@ public class ClientConfig {
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
-                .redirectUri("http://127.0.0.1:9000/login/oauth2/code/jjubul-web-client")
-                .redirectUri("http://127.0.0.1:9001/login/oauth2/code/jjubul-web-client")
-                .redirectUri("http://127.0.0.1:9000")
-                .redirectUri("http://127.0.0.1:9001")
+                .redirectUri("http://54.180.162.154:9000/login/oauth2/code/jjubul-web-client")
+                .redirectUri("http://54.180.162.154:9001/login/oauth2/code/jjubul-web-client")
+                .redirectUri("http://54.180.162.154:9001/login/oauth2/code/jjubul-web-client")
+                .redirectUri("http://54.180.162.154:9000")
+                .redirectUri("http://54.180.162.154:9001")
+                .redirectUri("http://54.180.162.154:9001")
                 .scope("openid")
                 .build();
 
