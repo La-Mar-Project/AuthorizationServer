@@ -1,0 +1,55 @@
+# workflow name
+name: CD Pipeline
+
+on:
+  repository_dispatch:
+    types: [deploy]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Debug TAG
+        run: echo "TAG=${{ github.event.client_payload.tag }}"
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.7
+        env:
+          TAG: ${{ github.event.client_payload.tag }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_KEY }}
+          envs: TAG
+          script: |
+            cd /home/ec2-user/deploy
+
+            docker pull geooeg/jjubul-auth:${TAG}
+
+            LIVE_PORT=$(grep -o "900[0-1]" /etc/nginx/conf.d/auth.conf)
+            
+            # 8080 포트 사용중이면 blue.yml이 live
+            if [ "$LIVE_PORT" = "9000" ]; then
+              TARGET_COMPOSE="docker-compose.auth.green.yml"
+              PREV_CONTAINER="jjubul-auth-server-blue"
+              TARGET_PORT=9001
+            else
+              TARGET_COMPOSE="docker-compose.auth.blue.yml"
+              PREV_CONTAINER="jjubul-auth-server-green"
+              TARGET_PORT=9000
+            fi
+            
+            # 이미지 명 변경
+            sed -i "s|image: geooeg/jjubul-auth:.*|image: geooeg/jjubul-auth:${TAG}|g" $TARGET_COMPOSE
+            
+            # 새 버전 컨테이너 실행
+            docker-compose -f $TARGET_COMPOSE up -d
+            
+            # nginx 포트 변경
+            sudo sed -i "s|proxy_pass http://localhost:900[0-1];|proxy_pass http://localhost:${TARGET_PORT};|g" /etc/nginx/conf.d/auth.conf
+            sudo nginx -s reload
+            
+            # 변경 후 기존 컨테이너 stop
+            docker stop $PREV_CONTAINER || true
+            docker rm $PREV_CONTAINER || true
