@@ -49,7 +49,7 @@ public class TokenService {
                     .issueTime(new Date())
                     .expirationTime(new Date(new Date().getTime() + 10 * 60 * 1000))
                     .claim("provider", user.getProvider().toString())
-                    .claim("Grade", user.getGrade().toString())
+                    .claim("grade", user.getGrade().toString())
                     .build();
 
             JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
