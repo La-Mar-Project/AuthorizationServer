@@ -9,6 +9,5 @@ public class NewOAuth2UserDto {
     private Provider provider;
     private String sub;
     private String email;
-    private Grade grade;
     private String name;
 }

@@ -26,6 +26,10 @@ public class OAuth2UserService {
     }
 
     public OAuth2User newUser(Provider provider, String sub, String email, String name) {
+        if (oAuth2UserRepository.existsByProviderAndSub(provider, sub)) {
+            throw new IllegalArgumentException("user already exists");
+        }
+
         return oAuth2UserRepository.save(OAuth2User.create(provider, sub, email, name));
     }
 }
