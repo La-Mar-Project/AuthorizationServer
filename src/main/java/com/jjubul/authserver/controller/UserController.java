@@ -2,6 +2,7 @@ package com.jjubul.authserver.controller;
 
 import com.jjubul.authserver.authentication.LocalUser;
 import com.jjubul.authserver.authorization.OAuth2User;
+import com.jjubul.authserver.authorization.Provider;
 import com.jjubul.authserver.dto.NewLocalUserDto;
 import com.jjubul.authserver.dto.NewOAuth2UserDto;
 import com.jjubul.authserver.service.LocalUserService;
@@ -24,8 +25,9 @@ public class UserController {
     }
 
     @PostMapping("/user/local")
-    public LocalUser newUser(NewLocalUserDto dto) {
-        return localUserService.newUser(dto.getAccount(), dto.getPassword());
+    public OAuth2User newUser(NewLocalUserDto dto) {
+        LocalUser localUser = localUserService.newUser(dto.getAccount(), dto.getPassword());
+        return oAuth2UserService.newUser(Provider.LOCAL, localUser.getId().toString(), dto.getEmail(), dto.getName());
     }
 
 }

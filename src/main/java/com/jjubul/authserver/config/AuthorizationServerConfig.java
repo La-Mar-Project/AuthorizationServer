@@ -28,9 +28,7 @@ public class AuthorizationServerConfig {
                 .with(configurer, Customizer.withDefaults())
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().permitAll());
-
         return http.build();
     }
 
