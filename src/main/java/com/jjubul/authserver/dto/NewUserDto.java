@@ -1,13 +1,13 @@
 package com.jjubul.authserver.dto;
 
-import com.jjubul.authserver.authorization.Grade;
 import com.jjubul.authserver.authorization.Provider;
 import lombok.Data;
 
 @Data
-public class NewOAuth2UserDto {
+public class NewUserDto {
     private Provider provider;
     private String sub;
-    private String email;
-    private String name;
+    private String username;
+    private String nickname;
+    private String phone;
 }

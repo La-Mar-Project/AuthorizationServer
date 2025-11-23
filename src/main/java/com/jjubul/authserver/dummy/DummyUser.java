@@ -17,7 +17,7 @@ public class DummyUser implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        OAuth2User user = OAuth2User.create(Provider.KAKAO, "4543976062", "jongyn1128@naver.com", "원종윤");
-        userService.newUser(Provider.KAKAO, "4543976062", "jongyn1128@naver.com", "원종윤");
+        OAuth2User user = OAuth2User.create(Provider.KAKAO, "4543976062", "원종윤");
+        userService.newUser(Provider.KAKAO, "4543976062", "원종윤", "종윤", "010-6326-1851");
     }
 }
