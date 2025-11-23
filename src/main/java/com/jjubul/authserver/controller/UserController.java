@@ -5,6 +5,7 @@ import com.jjubul.authserver.authorization.Provider;
 import com.jjubul.authserver.dto.NewUserDto;
 import com.jjubul.authserver.service.OAuth2UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
