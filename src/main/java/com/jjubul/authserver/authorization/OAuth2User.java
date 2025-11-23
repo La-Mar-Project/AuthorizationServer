@@ -26,8 +26,6 @@ public class OAuth2User {
     @Column(name = "oauth2_user_sub")
     private String sub;
 
-    @Column(name = "oauth2_user_email")
-    private String email;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_grade")
@@ -37,19 +35,17 @@ public class OAuth2User {
     private String name;
 
     @Builder
-    private OAuth2User(Provider provider, String sub, String email, Grade grade, String name) {
+    private OAuth2User(Provider provider, String sub, Grade grade, String name) {
         this.provider = provider;
         this.sub = sub;
-        this.email = email;
         this.grade = grade;
         this.name = name;
     }
 
-    public static OAuth2User create(Provider provider, String sub, String email, String name) {
+    public static OAuth2User create(Provider provider, String sub, String name) {
         return OAuth2User.builder()
                 .provider(provider)
                 .sub(sub)
-                .email(email)
                 .grade(Grade.BASIC)
                 .name(name)
                 .build();
