@@ -68,6 +68,7 @@ public class OAuth2UserService {
         if (oAuth2UserRepository.existsByProviderAndSub(provider, sub)) {
                 throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
         }
+
         userRepository.save(User.create(username, nickname, Grade.BASIC, phone, sub, provider));
         return oAuth2UserRepository.save(OAuth2User.create(provider, sub, username));
     }

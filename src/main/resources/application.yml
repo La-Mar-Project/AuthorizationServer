@@ -6,12 +6,21 @@ logging:
     org.springframework.security: DEBUG
 
 spring:
+  datasource:
+    url: ${CORE_DB_URL}
+    username: ${CORE_DB_USERNAME}
+    password: ${CORE_DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: validate
+
   security:
     oauth2:
       authorizationserver:
         issuer: https://jjubul-auth.duckdns.org
-
-
 
       client:
         registration:
@@ -42,15 +51,5 @@ spring:
             issuer-uri: https://kauth.kakao.com
             jwk-set-uri: https://kauth.kakao.com/.well-known/jwks.json
 
-  datasource:
-    url: ${CORE_DB_URL}
-    username: ${CORE_DB_USERNAME}
-    password: ${CORE_DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      initialization-fail-timeout: 0
-  jpa:
-    database-platform: org.hibernate.dialect.MySQL8Dialect
-    hibernate:
-      ddl-auto: validate
+
 
