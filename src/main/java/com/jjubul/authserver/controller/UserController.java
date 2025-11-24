@@ -9,12 +9,14 @@ import com.jjubul.authserver.dto.response.ApiResponse;
 import com.jjubul.authserver.service.OAuth2UserService;
 import com.jjubul.authserver.service.TokenService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class UserController {
@@ -25,8 +27,9 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<AccessTokenResponse>> signup(NewUserDto dto) {
 
+        log.info("dto={}", dto.toString());
         OAuth2User user = oAuth2UserService.newUser(dto.getJwt(), dto.getUsername(), dto.getNickname(), dto.getPhone());
-
+        log.info("user={}", user.getName());
         String myAccessToken = tokenService.buildMyAccessToken(user);
         RefreshTokenDto refreshTokenDto = tokenService.createRefreshToken(user.getId());
 
