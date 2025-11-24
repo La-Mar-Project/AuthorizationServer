@@ -1,6 +1,7 @@
 package com.jjubul.authserver.exception;
 
 import com.jjubul.authserver.authorization.Provider;
+import com.jjubul.authserver.authorization.User;
 import lombok.Getter;
 
 @Getter

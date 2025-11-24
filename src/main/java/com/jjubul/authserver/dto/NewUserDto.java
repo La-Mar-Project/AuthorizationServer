@@ -5,8 +5,7 @@ import lombok.Data;
 
 @Data
 public class NewUserDto {
-    private Provider provider;
-    private String sub;
+    private String jwt;
     private String username;
     private String nickname;
     private String phone;
