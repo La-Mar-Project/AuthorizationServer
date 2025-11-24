@@ -64,7 +64,7 @@ public class GlobalExceptionHandler {
 
     private static String buildRedirectUrl(SignedJWT jwt) {
         String redirectUrl = UriComponentsBuilder
-                .fromUriString("http://localhost:5199/signup")
+                .fromUriString("http://localhost:5200/signup")
                 .queryParam("jwt", jwt.serialize())
                 .build()
                 .toUriString();
