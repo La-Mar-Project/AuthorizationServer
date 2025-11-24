@@ -6,9 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
-    RefreshToken findByValue(String value);
+    Optional<RefreshToken> findByValue(String value);
     void deleteByValue(String value);
 }
