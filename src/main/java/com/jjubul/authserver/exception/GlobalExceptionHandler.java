@@ -2,6 +2,7 @@ package com.jjubul.authserver.exception;
 
 import com.jjubul.authserver.authorization.Provider;
 import com.jjubul.authserver.dto.OAuth2InfoDto;
+import com.jjubul.authserver.dto.response.ApiResponse;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -17,9 +18,11 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -28,6 +31,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
 
+@Slf4j
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
@@ -75,6 +79,14 @@ public class GlobalExceptionHandler {
                 .issueTime(new Date())
                 .expirationTime(new Date(new Date().getTime() + 10 * 60 * 1000))
                 .claim("provider", provider)
+                .build();
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<?>> handleException(Exception e) {
+        log.error("Unhandled Exception: {}", e.getMessage(), e);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
     }
 }
