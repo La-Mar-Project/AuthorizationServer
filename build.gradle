@@ -26,6 +26,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-reactor-netty' // optional
     implementation 'org.springframework:spring-webflux' // webclient만 포함
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation("org.flywaydb:flyway-core")//flyway
+    implementation("org.flywaydb:flyway-mysql")//flyway
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

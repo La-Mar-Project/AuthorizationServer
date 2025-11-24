@@ -2,6 +2,7 @@ package com.jjubul.authserver.authorization;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
 
@@ -34,6 +35,7 @@ public class User {
     @Column(name = "user_phone", unique = true)
     private String phone;
 
+    @Builder
     private User(String username, String nickname, Grade grade, String phone, String sub, Provider provider) {
         this.username = username;
         this.nickname = nickname;
@@ -44,6 +46,13 @@ public class User {
     }
 
     public static User create(String username, String nickname, Grade grade, String phone, String sub, Provider provider) {
-        return new User(username, nickname, grade, phone, sub, provider);
+        return User.builder()
+                .username(username)
+                .nickname(nickname)
+                .grade(grade)
+                .phone(phone)
+                .sub(sub)
+                .provider(provider)
+                .build();
     }
 }
