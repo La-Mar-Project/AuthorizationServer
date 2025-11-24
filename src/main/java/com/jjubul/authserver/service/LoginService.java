@@ -35,43 +35,33 @@ public class LoginService {
         ClientRegistration clientRegistration =
                 clientRegistrationRepository.findByRegistrationId(provider);
 
+        MultiValueMap<String, String> params = buildRequestBody(code, clientRegistration);
+
+        Map<String, Object> response = buildResponse(clientRegistration, params);
+
+        return response.get("id_token").toString();
+    }
+
+    private Map<String, Object> buildResponse(ClientRegistration clientRegistration, MultiValueMap<String, String> params) {
+        return webClientBuilder.build()
+                .post()
+                .uri(clientRegistration.getProviderDetails().getTokenUri())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(params)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
+                })
+                .block();
+    }
+
+    private static MultiValueMap<String, String> buildRequestBody(String code, ClientRegistration clientRegistration) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", clientRegistration.getClientId());
         params.add("client_secret", clientRegistration.getClientSecret());
         params.add("redirect_uri", clientRegistration.getRedirectUri());
         params.add("code", code);
-//
-//        Map<String, Object> response = webClientBuilder.build()
-//                .post()
-//                .uri(clientRegistration.getProviderDetails().getTokenUri())
-//                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-//                .bodyValue(params)
-//                .retrieve()
-//                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
-//                .block();
-
-        ClientResponse clientResponse = webClientBuilder.build()
-                .post()
-                .uri(clientRegistration.getProviderDetails().getTokenUri())
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .bodyValue(params)
-                .exchange() // 핵심
-                .block();
-
-
-        String block = clientResponse.bodyToMono(String.class).block();
-        log.info("status={}", clientResponse.statusCode().value());
-        log.info("headers={}", clientResponse.headers().asHttpHeaders());
-        log.info("body={}", block);
-
-        try {
-            return new ObjectMapper().readTree(block).get("id_token").asText();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-//        return response.get("id_token").toString();
-        //for debug kakao
+        return params;
     }
 
     public String start(String provider) {
