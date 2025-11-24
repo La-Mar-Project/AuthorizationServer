@@ -3,8 +3,14 @@ package com.jjubul.authserver.controller;
 import com.jjubul.authserver.authorization.OAuth2User;
 import com.jjubul.authserver.authorization.Provider;
 import com.jjubul.authserver.dto.NewUserDto;
+import com.jjubul.authserver.dto.RefreshTokenDto;
+import com.jjubul.authserver.dto.response.AccessTokenResponse;
+import com.jjubul.authserver.dto.response.ApiResponse;
 import com.jjubul.authserver.service.OAuth2UserService;
+import com.jjubul.authserver.service.TokenService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,9 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final OAuth2UserService oAuth2UserService;
+    private final TokenService tokenService;
 
-    @PostMapping("/users")
-    public OAuth2User newUser(NewUserDto dto) {
-        return oAuth2UserService.newUser(dto.getProvider(), dto.getSub(), dto.getUsername(), dto.getNickname(), dto.getPhone());
+    @PostMapping("/signup")
+    public ResponseEntity<ApiResponse<AccessTokenResponse>> signup(NewUserDto dto) {
+
+        OAuth2User user = oAuth2UserService.newUser(dto.getJwt(), dto.getUsername(), dto.getNickname(), dto.getPhone());
+
+        String myAccessToken = tokenService.buildMyAccessToken(user);
+        RefreshTokenDto refreshTokenDto = tokenService.createRefreshToken(user.getId());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenDto.getCookie().toString())
+                .body(ApiResponse.success("회원가입을 성공하였습니다.", AccessTokenResponse.from(myAccessToken)));
     }
 }

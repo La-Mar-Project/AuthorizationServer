@@ -3,6 +3,7 @@ package com.jjubul.authserver.service;
 import com.jjubul.authserver.authorization.OAuth2User;
 import com.jjubul.authserver.authorization.Provider;
 import com.jjubul.authserver.authorization.RefreshToken;
+import com.jjubul.authserver.dto.RefreshTokenDto;
 import com.jjubul.authserver.repository.RefreshTokenRepository;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -15,7 +16,9 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,7 @@ import java.net.URL;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -32,101 +36,60 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TokenService {
 
-    private final ClientRegistrationRepository clientRegistrationRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JWKSource<SecurityContext> jwkSource;
+    private final JwtUtil jwtUtil;
 
-    public String toLocalToken(OAuth2User user) {
+    public String buildMyAccessToken(OAuth2User user) {
         try {
             JWK jwk = jwkSource.get(new JWKSelector(new JWKMatcher.Builder().build()), null).getFirst();
             RSAKey rsaKey = jwk.toRSAKey();
-            RSASSASigner signer = new RSASSASigner(rsaKey);
 
-            JWTClaimsSet claims = new JWTClaimsSet.Builder()
-                    .subject(user.getSub())
-                    .issuer("jjubul-auth-server")
-                    .audience("jjubul-api-server")
-                    .issueTime(new Date())
-                    .expirationTime(new Date(new Date().getTime() + 10 * 60 * 1000))
-                    .claim("provider", user.getProvider().toString())
-                    .claim("grade", user.getGrade().toString())
-                    .build();
-
-            JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
-                    .keyID(rsaKey.getKeyID())
-                    .build();
-
-            SignedJWT jwt = new SignedJWT(header, claims);
-            jwt.sign(signer);
-
-            return jwt.serialize();
-
+            return jwtUtil.buildMyToken(rsaKey, user.getSub(), user.getProvider().toString(), user.getGrade().toString());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-
-    public String createRefreshToken(Long userId) {
+    public RefreshTokenDto createRefreshToken(Long userId) {
 
         String token = UUID.randomUUID().toString();
 
         Instant expiresAt = Instant.now().plusSeconds(60L * 60 * 24 * 14);
 
         RefreshToken refreshToken = RefreshToken.create(userId, token, expiresAt);
+        ResponseCookie cookie = CookieUtil.buildCookie("refresh_token", refreshToken.getValue());
 
-        RefreshToken saved = refreshTokenRepository.save(refreshToken);
+        refreshTokenRepository.save(refreshToken);
 
-        return saved.getValue();
+        return RefreshTokenDto.builder()
+                .refreshToken(refreshToken.getValue())
+                .cookie(cookie)
+                .build();
     }
 
     public Long verifyRefreshToken(String token) {
-        RefreshToken rt = refreshTokenRepository.findByValue(token);
 
-        if (Instant.now().isAfter(rt.getExpiresAt())) {
+        RefreshToken refreshToken = refreshTokenRepository.findByValue(token)
+                .orElseThrow(EntityNotFoundException::new);
+
+        if (Instant.now().isAfter(refreshToken.getExpiresAt())) {
             throw new RuntimeException("Expired Token");
         }
 
-        return rt.getUserId();
+        return refreshToken.getId();
     }
 
-    public void deleteRefreshToken(String token) {
+    public RefreshTokenDto deleteRefreshToken(String token) {
+
         refreshTokenRepository.deleteByValue(token);
-    }
 
-    public String verifyToken(String idToken, String provider) {
-        try {
+        ResponseCookie cookie = CookieUtil.buildCookie("refresh_token", "");
 
-            ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(provider);
-
-            JWKSet jwkSet = JWKSet.load(new URL(clientRegistration.getProviderDetails().getJwkSetUri()));
-
-            SignedJWT signedJWT = SignedJWT.parse(idToken);
-
-            JWK jwk = jwkSet.getKeyByKeyId(signedJWT.getHeader().getKeyID());
-
-            RSASSAVerifier verifier = new RSASSAVerifier(jwk.toRSAKey());
-            boolean isValid = signedJWT.verify(verifier);
-            if (!isValid) {
-                throw new RuntimeException("Invalid Signature");
-            }
-
-            if (!clientRegistration.getProviderDetails().getIssuerUri().equals(signedJWT.getJWTClaimsSet().getIssuer())) {
-                throw new RuntimeException("Invalid Issuer");
-            }
-
-            if (!clientRegistration.getClientId().equals(signedJWT.getJWTClaimsSet().getAudience().getFirst())) {
-                throw new RuntimeException("Invalid Client Id");
-            }
-
-            if (signedJWT.getJWTClaimsSet().getExpirationTime().before(new Date())) {
-                throw new RuntimeException("Expired Token");
-            }
-
-            return signedJWT.getJWTClaimsSet().getSubject();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return RefreshTokenDto.builder()
+                .refreshToken("")
+                .cookie(cookie)
+                .build();
     }
 
 }

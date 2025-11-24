@@ -49,4 +49,15 @@ public class LoginService {
 
         return response.get("id_token").toString();
     }
+
+    public String start(String provider) {
+
+        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(provider);
+
+        return  clientRegistration.getProviderDetails().getAuthorizationUri() +
+                "?response_type=code" +
+                "&client_id=" + clientRegistration.getClientId() +
+                "&redirect_uri=" + clientRegistration.getRedirectUri() +
+                "&scope=openid";
+    }
 }

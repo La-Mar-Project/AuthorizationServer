@@ -34,7 +34,7 @@ public class DefaultSecurityConfig {
                 .authorizeHttpRequests(request -> request
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                .requestMatchers("/login", "/", "/auth/**", "/oauth2/**", "/.well-known/jwks.json", "/error", "/users").permitAll()
+                .requestMatchers("/login", "/", "/auth/**", "/oauth2/**", "/.well-known/jwks.json", "/error", "/signup").permitAll()
                 .anyRequest().authenticated());
 
         return http.build();
