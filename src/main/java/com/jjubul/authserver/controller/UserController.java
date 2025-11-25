@@ -23,7 +23,6 @@ public class UserController {
     private final OAuth2UserService oAuth2UserService;
     private final TokenService tokenService;
 
-    @Slf4j
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<String>> signup(NewUserDto dto) {
 
