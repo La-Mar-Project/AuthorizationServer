@@ -26,9 +26,7 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<String>> signup(NewUserDto dto) {
 
-        log.info("dto={}", dto.toString());
         OAuth2User user = oAuth2UserService.newUser(dto.getJwt(), dto.getUsername(), dto.getNickname(), dto.getPhone());
-        log.info("user={}", user.getName());
         String myAccessToken = tokenService.buildMyAccessToken(user);
         RefreshTokenDto refreshTokenDto = tokenService.createRefreshToken(user.getId());
 

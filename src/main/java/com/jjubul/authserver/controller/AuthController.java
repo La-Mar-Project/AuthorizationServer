@@ -26,16 +26,17 @@ public class AuthController {
     @PostMapping("/token/refresh")
     public ResponseEntity<ApiResponse<String>> refreshToken(@CookieValue("refresh_token") String refreshToken) {
 
+        log.info("refreshToken: {}", refreshToken);
         Long userId = tokenService.verifyRefreshToken(refreshToken);
-
+        log.info("userId: {}", userId);
         OAuth2User user = userService.getUser(userId);
-
+        log.info("user: {}", user);
         tokenService.deleteRefreshToken(refreshToken);
 
         RefreshTokenDto refreshTokenDto = tokenService.createRefreshToken(user.getId());
-
+        log.info("refreshTokenDto: {}", refreshTokenDto);
         String accessToken = tokenService.buildMyAccessToken(user);
-
+        log.info("accessToken: {}", accessToken);
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.SET_COOKIE, refreshTokenDto.getCookie().toString())
