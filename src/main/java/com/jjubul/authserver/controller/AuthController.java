@@ -1,22 +1,17 @@
 package com.jjubul.authserver.controller;
 
 import com.jjubul.authserver.authorization.OAuth2User;
-import com.jjubul.authserver.authorization.Provider;
 import com.jjubul.authserver.dto.RefreshTokenDto;
 import com.jjubul.authserver.dto.response.ApiResponse;
-import com.jjubul.authserver.service.JwtUtil;
 import com.jjubul.authserver.service.LoginService;
 import com.jjubul.authserver.service.TokenService;
 import com.jjubul.authserver.service.OAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.Map;
 
 @Slf4j
 @RestController
