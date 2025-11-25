@@ -3,7 +3,6 @@ package com.jjubul.authserver.controller;
 import com.jjubul.authserver.authorization.OAuth2User;
 import com.jjubul.authserver.authorization.Provider;
 import com.jjubul.authserver.dto.RefreshTokenDto;
-import com.jjubul.authserver.dto.response.AccessTokenResponse;
 import com.jjubul.authserver.dto.response.ApiResponse;
 import com.jjubul.authserver.service.JwtUtil;
 import com.jjubul.authserver.service.LoginService;
@@ -30,7 +29,7 @@ public class AuthController {
     private final OAuth2UserService userService;
 
     @PostMapping("/token/refresh")
-    public ResponseEntity<ApiResponse<AccessTokenResponse>> refreshToken(@CookieValue("refresh_token") String refreshToken) {
+    public ResponseEntity<ApiResponse<String>> refreshToken(@CookieValue("refresh_token") String refreshToken) {
 
         Long userId = tokenService.verifyRefreshToken(refreshToken);
 
@@ -43,8 +42,9 @@ public class AuthController {
         String accessToken = tokenService.buildMyAccessToken(user);
 
         return ResponseEntity.ok()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.SET_COOKIE, refreshTokenDto.getCookie().toString())
-                .body(ApiResponse.success("리프레시 토큰을 사용하여 액세스 토큰을 발급하였습니다.", AccessTokenResponse.from(accessToken)));
+                .body(ApiResponse.success("리프레시 토큰을 사용하여 액세스 토큰을 발급하였습니다."));
     }
 
     @PostMapping("/logout")
@@ -68,18 +68,19 @@ public class AuthController {
     }
 
     @GetMapping("/{provider}/callback")
-    public ResponseEntity<ApiResponse<AccessTokenResponse>> callback(@RequestParam String code, @PathVariable String provider) {
+    public ResponseEntity<Void> callback(@RequestParam String code, @PathVariable String provider) {
 
         String idToken = loginService.callBack(code, provider);
 
         OAuth2User user = userService.getUserByToken(idToken, provider);
 
-        String myAccessToken = tokenService.buildMyAccessToken(user);
-
         RefreshTokenDto refreshTokenDto = tokenService.createRefreshToken(user.getId());
 
-        return ResponseEntity.ok()
+        String redirectUrl = "http://localhost:5200/home";
+
+        return ResponseEntity.status(HttpStatus.FOUND)
                 .header(HttpHeaders.SET_COOKIE, refreshTokenDto.getCookie().toString())
-                .body(ApiResponse.success("로그인에 성공하였습니다.", AccessTokenResponse.from(myAccessToken)));
+                .header(HttpHeaders.LOCATION, redirectUrl)
+                .build();
     }
 }

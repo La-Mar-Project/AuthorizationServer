@@ -4,7 +4,6 @@ import com.jjubul.authserver.authorization.OAuth2User;
 import com.jjubul.authserver.authorization.Provider;
 import com.jjubul.authserver.dto.NewUserDto;
 import com.jjubul.authserver.dto.RefreshTokenDto;
-import com.jjubul.authserver.dto.response.AccessTokenResponse;
 import com.jjubul.authserver.dto.response.ApiResponse;
 import com.jjubul.authserver.service.OAuth2UserService;
 import com.jjubul.authserver.service.TokenService;
@@ -25,7 +24,7 @@ public class UserController {
     private final TokenService tokenService;
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<AccessTokenResponse>> signup(NewUserDto dto) {
+    public ResponseEntity<ApiResponse<String>> signup(NewUserDto dto) {
 
         log.info("dto={}", dto.toString());
         OAuth2User user = oAuth2UserService.newUser(dto.getJwt(), dto.getUsername(), dto.getNickname(), dto.getPhone());
@@ -34,7 +33,8 @@ public class UserController {
         RefreshTokenDto refreshTokenDto = tokenService.createRefreshToken(user.getId());
 
         return ResponseEntity.ok()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + myAccessToken)
                 .header(HttpHeaders.SET_COOKIE, refreshTokenDto.getCookie().toString())
-                .body(ApiResponse.success("회원가입을 성공하였습니다.", AccessTokenResponse.from(myAccessToken)));
+                .body(ApiResponse.success("회원가입을 성공하였습니다."));
     }
 }
