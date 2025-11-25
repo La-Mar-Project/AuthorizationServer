@@ -63,7 +63,7 @@ public class TokenService {
             throw new RuntimeException("Expired Token");
         }
 
-        return refreshToken.getId();
+        return refreshToken.getUserId();
     }
 
     public RefreshTokenDto deleteRefreshToken(String token) {
