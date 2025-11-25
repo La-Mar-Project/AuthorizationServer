@@ -7,8 +7,12 @@ import lombok.Getter;
 @Getter
 public class UserNotFoundException extends RuntimeException {
 
-    private final Provider provider;
-    private final String sub;
+    private Provider provider;
+    private String sub;
+
+    public UserNotFoundException() {
+        super("User not found");
+    }
 
     public UserNotFoundException(Provider provider, String sub) {
         super("User not found");

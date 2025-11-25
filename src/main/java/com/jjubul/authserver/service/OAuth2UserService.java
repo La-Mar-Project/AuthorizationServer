@@ -48,7 +48,7 @@ public class OAuth2UserService {
 
     public OAuth2User getUser(Long id) {
         return oAuth2UserRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(UserNotFoundException::new);
     }
 
     public OAuth2User getUserByToken(String token, String provider) {
