@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -24,7 +25,7 @@ public class UserController {
     private final TokenService tokenService;
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<String>> signup(NewUserDto dto) {
+    public ResponseEntity<ApiResponse<String>> signup(@RequestBody NewUserDto dto) {
 
         log.info("jwt={}", dto.getJwt());
         log.info("jwt={}", dto.getUsername());
