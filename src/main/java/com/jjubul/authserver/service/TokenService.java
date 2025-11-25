@@ -1,33 +1,19 @@
 package com.jjubul.authserver.service;
 
 import com.jjubul.authserver.authorization.OAuth2User;
-import com.jjubul.authserver.authorization.Provider;
 import com.jjubul.authserver.authorization.RefreshToken;
 import com.jjubul.authserver.dto.RefreshTokenDto;
+import com.jjubul.authserver.exception.RefreshTokenNotFoundException;
 import com.jjubul.authserver.repository.RefreshTokenRepository;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSSigner;
-import com.nimbusds.jose.KeySourceException;
-import com.nimbusds.jose.crypto.RSASSASigner;
-import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.URL;
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -71,7 +57,7 @@ public class TokenService {
     public Long verifyRefreshToken(String token) {
 
         RefreshToken refreshToken = refreshTokenRepository.findByValue(token)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(RefreshTokenNotFoundException::new);
 
         if (Instant.now().isAfter(refreshToken.getExpiresAt())) {
             throw new RuntimeException("Expired Token");
