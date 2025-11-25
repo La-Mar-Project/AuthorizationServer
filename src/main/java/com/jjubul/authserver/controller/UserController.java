@@ -23,8 +23,12 @@ public class UserController {
     private final OAuth2UserService oAuth2UserService;
     private final TokenService tokenService;
 
+    @Slf4j
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<String>> signup(NewUserDto dto) {
+
+        log.info("jwt={}", dto.getJwt());
+        log.info("jwt={}", dto.getUsername());
 
         OAuth2User user = oAuth2UserService.newUser(dto.getJwt(), dto.getUsername(), dto.getNickname(), dto.getPhone());
         String myAccessToken = tokenService.buildMyAccessToken(user);
