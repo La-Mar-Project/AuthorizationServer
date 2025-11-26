@@ -1,6 +1,7 @@
 package com.jjubul.authserver.controller;
 
 import com.jjubul.authserver.authorization.OAuth2User;
+import com.jjubul.authserver.authorization.Provider;
 import com.jjubul.authserver.dto.RefreshTokenDto;
 import com.jjubul.authserver.dto.response.ApiResponse;
 import com.jjubul.authserver.service.LoginService;
@@ -72,11 +73,24 @@ public class AuthController {
 
         RefreshTokenDto refreshTokenDto = tokenService.createRefreshToken(user.getId());
 
-        String redirectUrl = "http://localhost:5200/home";
+        String redirectUrl = "https://jjubull.vercel.app/home";
 
         return ResponseEntity.status(HttpStatus.FOUND)
                 .header(HttpHeaders.SET_COOKIE, refreshTokenDto.getCookie().toString())
                 .header(HttpHeaders.LOCATION, redirectUrl)
                 .build();
+    }
+
+    @GetMapping("/admin")
+    public ResponseEntity<ApiResponse<Void>> admin() {
+
+        OAuth2User user = userService.getUser("01055839181", Provider.LOCAL);
+        RefreshTokenDto refreshTokenDto = tokenService.createRefreshToken(user.getId());
+        String myAccessToken = tokenService.buildMyAccessToken(user);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenDto.getCookie().toString())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + myAccessToken)
+                .body(ApiResponse.success("관리자 로그인에 성공하였습니다."));
     }
 }
