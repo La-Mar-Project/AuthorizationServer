@@ -51,5 +51,20 @@ spring:
             issuer-uri: https://kauth.kakao.com
             jwk-set-uri: https://kauth.kakao.com/.well-known/jwks.json
 
+management:
+  info:
+    java.enabled: true
+    os.enabled: true
+    env.enabled: false
+  endpoint:
+    health.show-components: when_authorized
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,prometheus"
 
+info:
+  app:
+    name: jjubull
+    company: kiwibanana
 

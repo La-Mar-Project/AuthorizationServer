@@ -28,6 +28,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation("org.flywaydb:flyway-core")//flyway
     implementation("org.flywaydb:flyway-mysql")//flyway
+    implementation 'org.springframework.boot:spring-boot-starter-actuator' //actuator 추가
+    implementation 'io.micrometer:micrometer-registry-prometheus' //프로메테우스 추가
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
