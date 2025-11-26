@@ -8,6 +8,7 @@ import com.jjubul.authserver.repository.RefreshTokenRepository;
 import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
@@ -57,7 +58,7 @@ public class TokenService {
     public Long verifyRefreshToken(String token) {
 
         RefreshToken refreshToken = refreshTokenRepository.findByValue(token)
-                .orElseThrow(RefreshTokenNotFoundException::new);
+                .orElseThrow(EntityNotFoundException::new);
 
         if (Instant.now().isAfter(refreshToken.getExpiresAt())) {
             throw new RuntimeException("Expired Token");
