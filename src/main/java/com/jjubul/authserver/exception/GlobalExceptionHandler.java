@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
 
     private static String buildRedirectUrl(SignedJWT jwt) {
         String redirectUrl = UriComponentsBuilder
-                .fromUriString("http://localhost:5200/signup")
+                .fromUriString("https://jjubull.vercel.app/signup")
                 .queryParam("jwt", jwt.serialize())
                 .build()
                 .toUriString();
