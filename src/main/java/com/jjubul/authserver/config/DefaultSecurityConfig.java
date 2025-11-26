@@ -56,7 +56,8 @@ public class DefaultSecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .requestMatchers("/", "/auth/**", "/oauth2/**", "/.well-known/jwks.json", "/error", "/signup").permitAll()
-                .anyRequest().authenticated());
+                .anyRequest().authenticated())
+                .logout(AbstractHttpConfigurer::disable);;
 
         return http.build();
     }
