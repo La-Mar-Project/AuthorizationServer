@@ -13,6 +13,7 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedOrigin("https://frontend-admin-4.vercel.app"); // 프론트 도메인 명시
+        config.addAllowedOrigin("https://jjubull-admin.vercel.app"); // 프론트 도메인 명시
         config.addAllowedOrigin("https://jjubull.vercel.app"); // 프론트 도메인 명시
         config.addAllowedOrigin("https://jjubul-auth.duckdns.org");
         config.addAllowedOrigin("http://localhost:3000"); // 로컬 개발 환경
