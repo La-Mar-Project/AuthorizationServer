@@ -9,9 +9,7 @@ public class CookieUtil {
         return ResponseCookie.from(cookieName, cookieValue.toString())
                 .httpOnly(true)
                 .secure(true)
-//                .secure(false)
-                .sameSite("Strict")
-//                .sameSite("None")
+                .sameSite("None")
                 .path("/")
                 .maxAge(60L * 60 * 24 * 14)
                 .build();
