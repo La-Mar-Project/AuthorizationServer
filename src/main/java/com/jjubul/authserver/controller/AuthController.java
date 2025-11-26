@@ -85,8 +85,11 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> admin() {
 
         OAuth2User user = userService.getUser("01055839181", Provider.LOCAL);
+        log.info("user: {}", user.getName());
         RefreshTokenDto refreshTokenDto = tokenService.createRefreshToken(user.getId());
+        log.info("refreshTokenDto: {}", refreshTokenDto.getCookie().toString());
         String myAccessToken = tokenService.buildMyAccessToken(user);
+        log.info("myAccessToken: {}", myAccessToken.toString());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshTokenDto.getCookie().toString())
