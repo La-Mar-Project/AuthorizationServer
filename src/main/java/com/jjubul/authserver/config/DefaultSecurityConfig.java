@@ -3,6 +3,7 @@ package com.jjubul.authserver.config;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -26,6 +27,24 @@ import org.springframework.security.web.context.SecurityContextHolderFilter;
 public class DefaultSecurityConfig {
 
     @Bean
+    @Order(1)
+    public SecurityFilterChain prometheusFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/actuator/**")
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/actuator/prometheus").authenticated()
+                        .anyRequest().denyAll()
+                )
+                .httpBasic(Customizer.withDefaults())        // 🔥 여기서는 Basic 사용
+                .oauth2ResourceServer(AbstractHttpConfigurer::disable); // JWT 비활성화
+
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
         http
@@ -38,6 +57,14 @@ public class DefaultSecurityConfig {
                 .anyRequest().authenticated());
 
         return http.build();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService(PasswordEncoder encoder) {
+        UserDetails prometheusUser = User.withUsername("jjubull")
+                .password(encoder.encode("1234"))
+                .build();
+        return new InMemoryUserDetailsManager(prometheusUser);
     }
 
     @Bean
