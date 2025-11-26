@@ -1,5 +1,6 @@
 package com.jjubul.authserver.service;
 
+import com.jjubul.authserver.exception.AccessTokenExpiredException;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.*;
@@ -29,7 +30,7 @@ public class JwtUtil {
             }
 
             if (signedJWT.getJWTClaimsSet().getExpirationTime().before(new Date())) {
-                throw new RuntimeException("Expired Token");
+                throw new AccessTokenExpiredException("Access Token is expired");
             }
 
             return signedJWT.getJWTClaimsSet().getSubject();

@@ -1,12 +1,10 @@
 package com.jjubul.authserver.exception;
 
 import com.jjubul.authserver.authorization.Provider;
-import com.jjubul.authserver.dto.OAuth2InfoDto;
 import com.jjubul.authserver.dto.response.ApiResponse;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.KeySourceException;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKMatcher;
@@ -20,15 +18,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Date;
 
 @Slf4j
@@ -69,6 +64,18 @@ public class GlobalExceptionHandler {
                 .build()
                 .toUriString();
         return redirectUrl;
+    }
+
+    @ExceptionHandler(RefreshTokenExpiredException.class)
+    public ResponseEntity<ApiResponse<Void>> handleRefreshTokenExpiredException(RefreshTokenExpiredException ex) {
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.failure("리프레시 토큰이 만료되었습니다.", "REFRESH_TOKEN_EXPIRED", null));
+    }
+
+    @ExceptionHandler(AccessTokenExpiredException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAccessTokenExpiredException(AccessTokenExpiredException ex) {
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.failure("액세스 토큰이 만료되었습니다.", "ACCESS_TOKEN_EXPIRED", null));
     }
 
     private static JWTClaimsSet buildJwt(Provider provider, String sub) {
