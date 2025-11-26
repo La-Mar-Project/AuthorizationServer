@@ -26,6 +26,7 @@ public class TokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JWKSource<SecurityContext> jwkSource;
     private final JwtUtil jwtUtil;
+    private final Long refreshTokenMaxAge = 60L * 60 * 24 * 14;
 
     public String buildMyAccessToken(OAuth2User user) {
         try {
@@ -45,7 +46,7 @@ public class TokenService {
         Instant expiresAt = Instant.now().plusSeconds(60L * 60 * 24 * 14);
 
         RefreshToken refreshToken = RefreshToken.create(userId, token, expiresAt);
-        ResponseCookie cookie = CookieUtil.buildCookie("refresh_token", refreshToken.getValue());
+        ResponseCookie cookie = CookieUtil.buildCookie("refresh_token", refreshToken.getValue(), refreshTokenMaxAge);
 
         refreshTokenRepository.save(refreshToken);
 
@@ -71,7 +72,7 @@ public class TokenService {
 
         refreshTokenRepository.deleteByValue(token);
 
-        ResponseCookie cookie = CookieUtil.buildCookie("refresh_token", "");
+        ResponseCookie cookie = CookieUtil.buildCookie("refresh_token", "", 0L);
 
         return RefreshTokenDto.builder()
                 .refreshToken("")
