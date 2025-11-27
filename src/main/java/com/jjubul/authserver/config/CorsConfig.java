@@ -6,16 +6,24 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.List;
+
 @Configuration
 public class CorsConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOriginPattern("*");
+        config.addAllowedOrigin("https://frontend-admin-4.vercel.app"); // 프론트 도메인 명시
+        config.addAllowedOrigin("https://jjubull-admin.vercel.app"); // 프론트 도메인 명시
+        config.addAllowedOrigin("https://jjubull.vercel.app"); // 프론트 도메인 명시
+        config.addAllowedOrigin("https://jjubul-auth.duckdns.org");
+        config.addAllowedOrigin("http://localhost:3000"); // 로컬 개발 환경
+        config.addAllowedOrigin("http://localhost:5173"); // 로컬 개발 환경
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.setAllowCredentials(true);
+        config.setExposedHeaders(List.of("Authorization", "X-Other-Header"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

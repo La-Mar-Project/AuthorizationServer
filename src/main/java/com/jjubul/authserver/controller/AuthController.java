@@ -1,6 +1,7 @@
 package com.jjubul.authserver.controller;
 
 import com.jjubul.authserver.authorization.OAuth2User;
+import com.jjubul.authserver.authorization.Provider;
 import com.jjubul.authserver.dto.RefreshTokenDto;
 import com.jjubul.authserver.dto.response.ApiResponse;
 import com.jjubul.authserver.service.LoginService;
@@ -26,16 +27,17 @@ public class AuthController {
     @PostMapping("/token/refresh")
     public ResponseEntity<ApiResponse<String>> refreshToken(@CookieValue("refresh_token") String refreshToken) {
 
+        log.info("refreshToken: {}", refreshToken);
         Long userId = tokenService.verifyRefreshToken(refreshToken);
-
+        log.info("userId: {}", userId);
         OAuth2User user = userService.getUser(userId);
-
+        log.info("user: {}", user);
         tokenService.deleteRefreshToken(refreshToken);
 
         RefreshTokenDto refreshTokenDto = tokenService.createRefreshToken(user.getId());
-
+        log.info("refreshTokenDto: {}", refreshTokenDto);
         String accessToken = tokenService.buildMyAccessToken(user);
-
+        log.info("accessToken: {}", accessToken);
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.SET_COOKIE, refreshTokenDto.getCookie().toString())
@@ -71,11 +73,27 @@ public class AuthController {
 
         RefreshTokenDto refreshTokenDto = tokenService.createRefreshToken(user.getId());
 
-        String redirectUrl = "http://localhost:5200/home";
+        String redirectUrl = "https://jjubull.vercel.app/home";
 
         return ResponseEntity.status(HttpStatus.FOUND)
                 .header(HttpHeaders.SET_COOKIE, refreshTokenDto.getCookie().toString())
                 .header(HttpHeaders.LOCATION, redirectUrl)
                 .build();
+    }
+
+    @GetMapping("/admin")
+    public ResponseEntity<ApiResponse<Void>> admin() {
+
+        OAuth2User user = userService.getUser("01055839181", Provider.LOCAL);
+        log.info("user: {}", user.getName());
+        RefreshTokenDto refreshTokenDto = tokenService.createRefreshToken(user.getId());
+        log.info("refreshTokenDto: {}", refreshTokenDto.getCookie().toString());
+        String myAccessToken = tokenService.buildMyAccessToken(user);
+        log.info("myAccessToken: {}", myAccessToken.toString());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenDto.getCookie().toString())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + myAccessToken)
+                .body(ApiResponse.success("관리자 로그인에 성공하였습니다."));
     }
 }

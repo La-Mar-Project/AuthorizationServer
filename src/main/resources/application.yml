@@ -25,8 +25,8 @@ spring:
       client:
         registration:
           kakao:
-            client_id: 4669985b9b5311232c052c08ba9aa67d
-            client-secret: ksxiB96VlzlFAWP0wEyg4jsXzxV7pZCs
+            client_id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
             redirect-uri: https://jjubul-auth.duckdns.org/auth/kakao/callback
 #            redirect-uri: http://localhost:9000/auth/kakao/callback
             scope: openid
@@ -35,8 +35,8 @@ spring:
             provider: kakao
 
           google:
-            client-id: 1097725503933-9lpcecr1lipovuhue8k7fcq8evakcksm.apps.googleusercontent.com
-            client-secret: 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
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             scope: openid
             provider: google
             redirect-uri: https://jjubul-auth.duckdns.org/auth/google/callback
@@ -51,5 +51,20 @@ spring:
             issuer-uri: https://kauth.kakao.com
             jwk-set-uri: https://kauth.kakao.com/.well-known/jwks.json
 
+management:
+  info:
+    java.enabled: true
+    os.enabled: true
+    env.enabled: false
+  endpoint:
+    health.show-components: when_authorized
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,prometheus"
 
+info:
+  app:
+    name: jjubull-auth
+    company: kiwibanana
 

@@ -8,6 +8,7 @@ import com.jjubul.authserver.repository.RefreshTokenRepository;
 import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class TokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JWKSource<SecurityContext> jwkSource;
     private final JwtUtil jwtUtil;
+    private final Long refreshTokenMaxAge = 60L * 60 * 24 * 14;
 
     public String buildMyAccessToken(OAuth2User user) {
         try {
@@ -44,7 +46,7 @@ public class TokenService {
         Instant expiresAt = Instant.now().plusSeconds(60L * 60 * 24 * 14);
 
         RefreshToken refreshToken = RefreshToken.create(userId, token, expiresAt);
-        ResponseCookie cookie = CookieUtil.buildCookie("refresh_token", refreshToken.getValue());
+        ResponseCookie cookie = CookieUtil.buildCookie("refresh_token", refreshToken.getValue(), refreshTokenMaxAge);
 
         refreshTokenRepository.save(refreshToken);
 
@@ -57,20 +59,20 @@ public class TokenService {
     public Long verifyRefreshToken(String token) {
 
         RefreshToken refreshToken = refreshTokenRepository.findByValue(token)
-                .orElseThrow(RefreshTokenNotFoundException::new);
+                .orElseThrow(EntityNotFoundException::new);
 
         if (Instant.now().isAfter(refreshToken.getExpiresAt())) {
             throw new RuntimeException("Expired Token");
         }
 
-        return refreshToken.getId();
+        return refreshToken.getUserId();
     }
 
     public RefreshTokenDto deleteRefreshToken(String token) {
 
         refreshTokenRepository.deleteByValue(token);
 
-        ResponseCookie cookie = CookieUtil.buildCookie("refresh_token", "");
+        ResponseCookie cookie = CookieUtil.buildCookie("refresh_token", "", 0L);
 
         return RefreshTokenDto.builder()
                 .refreshToken("")

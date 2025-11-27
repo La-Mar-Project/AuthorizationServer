@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -24,11 +25,12 @@ public class UserController {
     private final TokenService tokenService;
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<String>> signup(NewUserDto dto) {
+    public ResponseEntity<ApiResponse<String>> signup(@RequestBody NewUserDto dto) {
 
-        log.info("dto={}", dto.toString());
+        log.info("jwt={}", dto.getJwt());
+        log.info("jwt={}", dto.getUsername());
+
         OAuth2User user = oAuth2UserService.newUser(dto.getJwt(), dto.getUsername(), dto.getNickname(), dto.getPhone());
-        log.info("user={}", user.getName());
         String myAccessToken = tokenService.buildMyAccessToken(user);
         RefreshTokenDto refreshTokenDto = tokenService.createRefreshToken(user.getId());
 
