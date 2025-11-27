@@ -65,6 +65,6 @@ management:
 
 info:
   app:
-    name: jjubull
+    name: jjubull-auth
     company: kiwibanana
 
